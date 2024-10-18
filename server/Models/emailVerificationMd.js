@@ -12,7 +12,7 @@ const emailVerificationSchema = new mongoose.Schema({
 	createdAt: {
 		type: Date,
 		default: Date.now,
-		expires: '5min',
+		expires: '10min',
 	},
 });
 
