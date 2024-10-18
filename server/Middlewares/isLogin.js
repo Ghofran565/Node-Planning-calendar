@@ -13,10 +13,7 @@ const isLogin = catchAsync(async (req, res, next) => {
 
 	if (!token) {
 		return next(
-			new HandleError(
-				'Authentication required. Please log in.',
-				401
-			)
+			new HandleError('Authentication required. Please log in.', 401)
 		);
 	}
 
