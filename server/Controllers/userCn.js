@@ -69,7 +69,7 @@ export const chengePassword = catchAsync(async (req, res, next) => {
 		);
 	}
 
-	if (!passwordRegex.test(password)) {
+	if (!passwordRegex.test(newPass)) {
 		return next(
 			new HandleError(
 				'Password must be at least 8 characters long and contain at least one letter and one number.',
