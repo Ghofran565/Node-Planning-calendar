@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
 
-const feedBackBoxSchema = new mongoose.Schema(
+const FeedbackSchema = new mongoose.Schema(
 	{
 		senderId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
+			required: [true, 'SenderId is required'],
 		},
 		title: {
 			type: String,
@@ -21,6 +22,6 @@ const feedBackBoxSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-const FeedBackBox = mongoose.model('FeedBackBox', feedBackBoxSchema);
+const Feedback = mongoose.model('Feedback', FeedbackSchema);
 
-export default FeedBackBox;
+export default Feedback;
