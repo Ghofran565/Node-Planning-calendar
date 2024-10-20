@@ -3,6 +3,7 @@ import catchAsync from '../Utils/catchAsync.js';
 import HandleError from '../Utils/handleError.js';
 import ApiFeatures from '../Utils/apiFeatures.js';
 import User from '../Models/userMd.js';
+import Admin from './../Models/adminMd.js';
 
 const passwordRegex = /(?=.*?[a-z])(?=.*?[0-9]).{8,}$/g;
 
@@ -111,8 +112,10 @@ export const createUser = catchAsync(async (req, res, next) => {
 		);
 	}
 
+
+	const existingAdmin = await Admin.findOne({ nationalId });
 	const existingUser = await User.findOne({ nationalId });
-	if (existingUser) {
+	if (existingAdmin || existingUser) {
 		return next(new HandleError('nationalId is already registered.', 400));
 	}
 
