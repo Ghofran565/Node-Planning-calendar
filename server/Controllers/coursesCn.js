@@ -1,6 +1,6 @@
 import catchAsync from '../Utils/catchAsync.js';
 import HandleError from '../Utils/handleError.js';
-import Courses from './../Models/coursesMd';
+import Courses from './../Models/coursesMd.js';
 
 export const getAllCourses = catchAsync(async (req, res, next) => {
 	const data = await Courses.find().select('-__v');

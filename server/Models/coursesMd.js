@@ -10,20 +10,24 @@ const coursesSchema = new mongoose.Schema({
 	},
 
 	preferedGrades: {
-		type: Array,
-		enum: [
-			'7th',
-			'8th',
-			'9th',
-			'experimental-10th',
-			'experimental-11th',
-			'experimental-12th',
-			'mathematics-10th',
-			'mathematics-11th',
-			'mathematics-12th',
-			'humanities-10th',
-			'humanities-11th',
-			'humanities-12th',
+		type: [
+			{
+				type: String,
+				enum: [
+					'7th',
+					'8th',
+					'9th',
+					'experimental-10th',
+					'experimental-11th',
+					'experimental-12th',
+					'mathematics-10th',
+					'mathematics-11th',
+					'mathematics-12th',
+					'humanities-10th',
+					'humanities-11th',
+					'humanities-12th',
+				],
+			},
 		],
 	},
 });

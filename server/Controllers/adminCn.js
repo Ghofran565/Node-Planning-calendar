@@ -2,7 +2,7 @@ import bcryptjs from 'bcryptjs';
 import catchAsync from '../Utils/catchAsync.js';
 import HandleError from '../Utils/handleError.js';
 import ApiFeatures from '../Utils/apiFeatures.js';
-import Admin from './../Models/adminMd';
+import Admin from './../Models/adminMd.js';
 import User from '../Models/userMd.js';
 
 const passwordRegex = /(?=.*?[a-z])(?=.*?[0-9]).{8,}$/g;
