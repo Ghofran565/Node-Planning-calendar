@@ -4,6 +4,7 @@ import catchAsync from '../Utils/catchAsync.js';
 
 const isLogin = catchAsync(async (req, res, next) => {
 	let token;
+	let decoded;
 	if (
 		req.headers.authorization &&
 		req.headers.authorization.startsWith('Bearer')
@@ -11,13 +12,17 @@ const isLogin = catchAsync(async (req, res, next) => {
 		token = req.headers.authorization.split(' ')[1];
 	}
 
-	if (!token) {
+	try {
+		decoded = jwt.verify(token, process.env.JWT_SECRET);
+	} catch (error) {
+		decoded = false;
+	}
+
+	if (!decoded) {
 		return next(
 			new HandleError('Authentication required. Please log in.', 401)
 		);
 	}
-
-	const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
 	req.decodedToken = decoded;
 	return next();
