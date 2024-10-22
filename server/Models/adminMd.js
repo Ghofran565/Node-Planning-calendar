@@ -46,7 +46,7 @@ const adminSchema = new mongoose.Schema(
 		},
 		isConfirming: {
 			type: Boolean,
-			default: true,
+			default: false,
 		},
 	},
 	{ timestamps: true }

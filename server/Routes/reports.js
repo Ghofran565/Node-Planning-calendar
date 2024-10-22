@@ -1,15 +1,18 @@
 import express from 'express';
 import {
-
+	confirmRecord,
+	createRecord,
+	getAllReports,
+	getIdReports,
+	registerComment,
 } from '../Controllers/reportsCn.js';
 import isLogin from '../Middlewares/isLogin.js';
-import isAdmin from './../Middlewares/isAdmin.js';
 
 const router = express.Router();
 
-// router.route('/auth').post(auth);
-// router.route('/forget-password').post(forgetPassword);
-// router.route('/forget-password-check').post(checkForgetPassword);
-// router.route('/change-password').patch(isLogin, changePassword);
+router.route('/').get(isLogin, getAllReports).post(isLogin, createRecord);
+router.route('/:id').get(isLogin, getIdReports);
+router.route('/confirm/:id').patch(isLogin, confirmRecord);
+router.route('/comment/:id').patch(isLogin, registerComment);
 
 export default router;

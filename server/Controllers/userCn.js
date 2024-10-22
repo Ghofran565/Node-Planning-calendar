@@ -4,6 +4,7 @@ import HandleError from '../Utils/handleError.js';
 import ApiFeatures from '../Utils/apiFeatures.js';
 import User from '../Models/userMd.js';
 import Admin from './../Models/adminMd.js';
+import Reports from '../Models/reportsMd.js';
 
 const passwordRegex = /(?=.*?[a-z])(?=.*?[0-9]).{8,}$/g;
 
@@ -126,6 +127,11 @@ export const createUser = catchAsync(async (req, res, next) => {
 		password: hashedPassword,
 		...others,
 	});
+	
+	const newRoport = await Reports.create({
+		userId: newUser._id
+	});
+
 
 	return res.status(201).json({
 		success: true,

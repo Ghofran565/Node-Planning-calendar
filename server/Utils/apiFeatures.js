@@ -9,7 +9,7 @@ class ApiFeatures {
 		for (const key in fieldsItems) {
 			delete queryObj[key];
 		}
-		this.query = this.query.find(queryObj.filters);
+		this.query = this.query.find(queryObj.filters).select('-__v');
 		return this;
 	}
 	sort() {
