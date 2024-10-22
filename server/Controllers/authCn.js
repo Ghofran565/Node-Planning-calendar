@@ -24,12 +24,13 @@ const generateToken = (user, additionalPayload = {}) => {
 export const auth = catchAsync(async (req, res, next) => {
 	let person;
 	const { nationalId, password } = req.body;
-	if (!nationalIdRegex.test(nationalId)) {
-		return next(new HandleError('Invalid NationalId format.', 400));
-	}
-	if (!passwordRegex.test(password)) {
-		return next(new HandleError('Invalid Password.', 400));
-	}
+	// if (!nationalIdRegex.test(nationalId)) {
+	// 	return next(new HandleError('Invalid NationalId format.', 400));
+	// }
+	// if (!passwordRegex.test(password)) {
+	// 	return next(new HandleError('Invalid Password.', 400));
+	// }
+	//TODO: what problem these have
 
 	const user = await User.findOne({ nationalId });
 	const admin = await Admin.findOne({ nationalId });
@@ -90,12 +91,13 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
 export const checkForgetPassword = catchAsync(async (req, res, next) => {
 	let person;
 	const { email, code } = req?.body;
-	if (!emailRegex.test(email)) {
-		return next(new HandleError('Invalid email format.', 400));
-	}
-	if (!verificationCodeRegex.test(code)) {
-		return next(new HandleError('Invalid verification code format.', 400));
-	}
+	// if (!emailRegex.test(email)) {
+	// 	return next(new HandleError('Invalid email format.', 400));
+	// }
+	// if (!verificationCodeRegex.test(code)) {
+	// 	return next(new HandleError('Invalid verification code format.', 400));
+	// }
+	//TODO: what problem these have
 
 	const user = await User.findOne({ email });
 	const admin = await Admin.findOne({ email });
@@ -115,7 +117,7 @@ export const checkForgetPassword = catchAsync(async (req, res, next) => {
 		return next(new HandleError('Invalid verification code.', 401));
 	}
 
-	token = generateToken(person, {
+	const token = generateToken(person, {
 		changePassword: true,
 	});
 
