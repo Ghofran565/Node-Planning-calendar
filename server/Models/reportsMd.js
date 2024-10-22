@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const recordSchema = new mongoose.Schema({
 	course: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: Courses,
+		ref: 'Courses',
 		required: [true, 'Course is required'],
 	},
 	duration: {
