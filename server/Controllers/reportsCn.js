@@ -103,104 +103,129 @@ export const createRecord = catchAsync(async (req, res, next) => {
 });
 
 export const confirmRecord = catchAsync(async (req, res, next) => {
-	// let updatedReport;
-	// const { id } = req.params;
-	// const { id: userId, role } = req.decodedToken;
+	let updatedReport;
+	const { id, sId } = req.params;
+	const { id: userId, role } = req.decodedToken;
 
-	// if (!role === 'parent' && !role === 'admin') {
-	// 	return next(new HandleError('You do not have the premission', 401));
-	// }
+	if (!role === 'parent') {
+		return next(new HandleError('You do not have the premission', 401));
+	}
 
-	// const admin = await Admin.findById(userId);
-	// const studentIds = admin.studentsIds;
-	// if (studentIds.includes(id) || role === 'admin') { //big problem in ID
-	// 	updatedReport = await Reports.records
-	// 		.findByIdAndUpdate(id, { isConfirmed: true })
-	// 		.select('-__v')
-	// 		.populate('*');
-	// 	if (!updatedReport) {
-	// 		new HandleError('No reports found by this id.', 404);
-	// 	}
-	// } else {
-	// 	return next(new HandleError('You do not have the premission', 401));
-	// }
+	const admin = await Admin.findById(userId);
+	const studentIds = admin.studentsIds;
 
-	// return res.status(200).json({
-	// 	success: true,
-	// 	message: 'This record confirmed successfully',
-	// 	data: {
-	// 		record: {
-	// 			date: updatedReport.date,
-	// 			confirm: updatedReport.isConfirmed,
-	// 		},
-	// 	},
-	// });
+	if (studentIds.includes(sId)) {
+		const report = await Reports.findOne({ userId: sId }).populate('*');
+		if (!report) {
+			return next(new HandleError('No reports found from the student id', 404));
+		}
+		if (report.records.findIndex((record) => record._id === id)) {
+			updatedReport = await Reports.records
+				.findByIdAndUpdate(id, { isConfirmed: true })
+				.select('-__v')
+				.populate('*');
+		} else {
+			return next(new HandleError('Id mismatch, no premission', 401));
+		}
+		if (!updatedReport) {
+			new HandleError('There was a problem in confirming record.', 500);
+		}
+	} else {
+		return next(new HandleError('You do not have the premission', 401));
+	}
 
 	return res.status(200).json({
-		success: false,
-		message: 'This controllers is under coding',
+		success: true,
+		message: 'This record confirmed successfully',
+		data: {
+			record: {
+				date: updatedReport.date,
+				confirm: updatedReport.isConfirmed,
+			},
+		},
 	});
 });
-//TODO not complected confirmRecord
 
 export const registerComment = catchAsync(async (req, res, next) => {
-   // let updatedReport
-	// const { id } = req.params;
-	// const { id: userId, role } = req.decodedToken;
-	// const { comment } = req?.body;
+	let updatedReport;
+	const { id, sId } = req.params;
+	const { id: userId, role } = req.decodedToken;
+	const { comment } = req?.body;
 
-	// if (role === 'admin') {
-	// 	return next(new HandleError('You do not have the premission', 401));
-	// }
-	// const admin = await Admin.findById(userId);
-   // const studentIds = admin.studentsIds;
+	if (role === 'admin') {
+		return next(new HandleError('You do not have the premission', 401));
+	}
+	const admin = await Admin.findById(userId);
+	const studentIds = admin.studentsIds;
 
-	// if (role == undefined) {
-	// 	const report = await Reports.findOne({ userId: userId }).populate('*');
-	// 	if (!report.records['_id'] == id) {
-	// 		return next(new HandleError('You do not have the premission', 401));
-	// 	}
+	if (role == undefined) {
+		const report = await Reports.findOne({ userId: userId }).populate('*');
+		if (!report.records.findIndex((record) => record._id === id)) {
+			return next(new HandleError('You do not have the premission', 401));
+		}
 
-	// 	updatedReport = await Reports.records
-	// 		.findByIdAndUpdate(id, {studentComment: comment})
-	// 		.select('-__v')
-	// 		.populate('*');
-	// 	if (!updatedReport) {
-	// 		new HandleError('There was a problem in update query, no returns recived', 404);
-	// 	}
-	// } else if (studentIds.includes(id)) { //!conT
-   //    const report = await Reports.findOne({ userId: userId }).populate('*');
-	// 	if (!report.records['_id'] == id) {
-	// 		return next(new HandleError('You do not have the premission', 401));
-	// 	}
+		updatedReport = await Reports.records
+			.findByIdAndUpdate(id, { studentComment: comment })
+			.select('-__v')
+			.populate('*');
+		if (!updatedReport) {
+			new HandleError(
+				'There was a problem in update query, no returns recived',
+				500
+			);
+		}
+	} else if (studentIds.includes(sId)) {
+		const report = await Reports.findOne({ userId: sId }).populate('*');
+		if (!report) {
+			return next(new HandleError('No reports found from the student id', 404));
+		}
+		if (role === 'supporter') {
+			if (report.records.findIndex((record) => record._id === id)) {
+				updatedReport = await Reports.records
+					.findByIdAndUpdate(id, { supporterComment: comment })
+					.select('-__v')
+					.populate('*');
+			} else {
+				return next(new HandleError('Id mismatch, no premission', 401));
+			}
+			if (!updatedReport) {
+				new HandleError(
+					'There was a problem in update query, no returns recived.',
+					500
+				);
+			}
+		} else {
+			//there is just 1 chance and that is parent
+			if (report.records.findIndex((record) => record._id === id)) {
+				updatedReport = await Reports.records
+					.findByIdAndUpdate(id, { parentComment: comment })
+					.select('-__v')
+					.populate('*');
+			} else {
+				return next(new HandleError('Id mismatch, no premission', 401));
+			}
+			if (!updatedReport) {
+				new HandleError(
+					'There was a problem in update query, no returns recived.',
+					500
+				);
+			}
+		}
+	}else {
+		return next(new HandleError('You do not have the premission', 401));
+	}
 
-	// 	updatedReport = await Reports.records
-	// 		.findByIdAndUpdate(id, {studentComment: comment})
-	// 		.select('-__v')
-	// 		.populate('*');
-	// 	if (!updatedReport) {
-	// 		new HandleError('There was a problem in update query, no returns recived', 404);
-	// 	}
-	// }
-   
-   // // return next(new HandleError('You do not have the premission', 401));
-	// const updatedReports = await Reports.records.findByIdAndUpdate();
-
-
-	// return res.status(201).json({
-	// 	success: true,
-	// 	message: "Today's report registered successfully.",
-	// 	data: {
-	// 		record: {
-	// 			date: savedReport.records.date,
-	// 			records: savedReport.records.record,
-	// 		},
-	// 	},
-	// });
-
-   return res.status(200).json({
-		success: false,
-		message: 'This controllers is under coding',
+	return res.status(201).json({
+		success: true,
+		message: `Your comment Updated as ${
+			role == undefined ? 'student' : role
+		} successfully.`,
+		data: {
+			record: {
+				date: updatedReport.records.date,
+				comment: updatedReport.records.parentComment,
+			},
+		},
 	});
+
 });
-//TODO not complected registerComment
