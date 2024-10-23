@@ -48,13 +48,18 @@ export const sendEmailCode = catchAsync(async (email, next) => {
 });
 
 export const verifyEmailCode = catchAsync(async (email, code) => {
+	console.log('OK email 1');
+
 	const emailVerificationCheck = await EmailVerification.findOne({
 		email,
 		code,
 	});
 
+	console.log('OK email 2');
+
 	if (!emailVerificationCheck) {
-		return {
+		console.log('OK email 3');
+		return {	
 			authorized: false,
 			// message: 'Verification code is incorrect or expired.',
 		};

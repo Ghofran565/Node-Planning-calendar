@@ -1,10 +1,16 @@
 import express from 'express';
-import { createCourse, deleteCourse, getAllCourses, getCourse, updateCourse } from '../Controllers/coursesCn.js';
+import {
+	createCourse,
+	deleteCourse,
+	getAllCourses,
+	getCourse,
+	updateCourse,
+} from '../Controllers/coursesCn.js';
 import isAdmin from '../Middlewares/isAdmin.js';
 
 const router = express.Router();
 
-router.route('/').get().get(getAllCourses).post(isAdmin, createCourse);
+router.route('/').get(getAllCourses).post(isAdmin, createCourse); 
 
 router
 	.route('/:id')

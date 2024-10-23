@@ -17,22 +17,19 @@ function addUploadToLog(id) {
 
 	if (existingUpload) {
 		if (existingUpload.times >= dailyUploadLimit) {
-			return next(
-				new HandleError(
-					'Access denied. You have exceeded your daily upload limit.',
-					403
-				)
-			);
+			return true;
 		} else {
 			existingUpload.times++;
 		}
 	} else {
-		uploadLog.push({ id, times: 1, date: new Date().toDateString() });
+		uploadLog.push({ id, times: 1 });
 	}
 }
 
 const checkUpload = catchAsync(async (req, res, next) => {
 	let token;
+	let decoded;
+
 	if (
 		req.headers.authorization &&
 		req.headers.authorization.startsWith('Bearer')
@@ -40,16 +37,28 @@ const checkUpload = catchAsync(async (req, res, next) => {
 		token = req.headers.authorization.split(' ')[1];
 	}
 
-	if (!token) {
+	try {
+		decoded = jwt.verify(token, process.env.JWT_SECRET);
+	} catch (error) {
+		decoded = false;
+	}
+	if (!decoded) {
 		return next(
 			new HandleError('Authentication required. Please log in.', 401)
 		);
 	}
 
-	const decoded = jwt.verify(token, process.env.JWT_SECRET);
 	const { id } = decoded;
 
-	addUploadToLog(id);
+	const log = addUploadToLog(id);
+	if (log) {
+		return next(
+			new HandleError(
+				'Access denied. You have exceeded your daily upload limit.',
+				403
+			)
+		);
+	}
 
 	req.decodedToken = decoded;
 	return next();

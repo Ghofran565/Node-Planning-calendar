@@ -3,10 +3,11 @@ import mongoose from 'mongoose';
 const coursesSchema = new mongoose.Schema({
 	name: {
 		type: String,
+		unique: [true, 'There is a course registered with this name.'],
 		required: [true, 'Name is required'],
 		minLength: [2, 'Name must be at least 2 characters long'],
 		maxLength: [50, 'Name cannot exceed 50 characters'],
-		match: [/^[a-zA-Z]+$/, 'Name invalid'],
+		match: [/^[a-zA-Z0-9]+$/, 'Name invalid'],
 	},
 
 	preferedGrades: {

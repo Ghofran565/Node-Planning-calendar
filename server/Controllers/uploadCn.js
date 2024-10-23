@@ -9,7 +9,7 @@ export const uploadFile = catchAsync(async (req, res, next) => {
 	if (!file) {
 		return next(new HandleError("You haven't uploaded any file. Please upload one.", 400));
 	}
-
+	
 	res.status(200).json({
 		success: true,
 		data: file,
