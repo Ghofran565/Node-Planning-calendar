@@ -39,22 +39,15 @@ export const getAdmin = catchAsync(async (req, res, next) => {
 
 export const updateAdmin = catchAsync(async (req, res, next) => {
 	const { id } = req.params;
-	const { nationalId, email, ...others } = req?.body;
+	const { nationalId = '', email = '', password = '', ...others } = req?.body;
 
-	const existingAdmin1 = await Admin.findOne({ nationalId });
-	const existingAdmin2 = await Admin.findOne({ email });
-	const existingUser1 = await User.findOne({ nationalId });
-	const existingUser2 = await User.findOne({ email });
-	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
-		return next(
-			new HandleError('nationalId or email is already registered.', 400)
-		);
-	}
-
-	const updatedAdmin = await Admin.findByIdAndUpdate(id, req?.body, {
+	const updatedAdmin = await Admin.findByIdAndUpdate(id, others, {
 		new: true,
 		runValidators: true,
 	}).select('-password -__v');
+	if (!updatedAdmin) {
+		return next(new HandleError(`User with ID ${id} not found.`, 404));
+	}
 
 	return res.status(200).json({
 		success: true,
@@ -120,7 +113,10 @@ export const createAdmin = catchAsync(async (req, res, next) => {
 	const existingUser2 = await User.findOne({ email });
 	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
 		return next(
-			new HandleError('nationalId or email is already registered.', 400)
+			new HandleError(
+				'nationalId or email is already registered for another admin or user.',
+				400
+			)
 		);
 	}
 

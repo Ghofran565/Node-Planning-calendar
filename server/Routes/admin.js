@@ -15,6 +15,6 @@ router.route('/').get(isAdmin, getAllAdmin).post(isAdmin, createAdmin);
 
 router.route('/:id').get(isLogin, getAdmin).patch(isAdmin, updateAdmin);
 
-router.route('/chenge-password').patch(isLogin, chengePasswordAdmin);
+router.route('/chenge-password').post(isLogin, chengePasswordAdmin);
 
 export default router;

@@ -40,25 +40,15 @@ export const getUser = catchAsync(async (req, res, next) => {
 
 export const updateUser = catchAsync(async (req, res, next) => {
 	const { id } = req.params;
-	const { nationalId, email, ...others } = req?.body;
+	const { nationalId, email, password, others } = req?.body;
 
-	const existingAdmin1 = await Admin.findOne({ nationalId });
-	const existingAdmin2 = await Admin.findOne({ email });
-	const existingUser1 = await User.findOne({ nationalId });
-	const existingUser2 = await User.findOne({ email });
-	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
-		if(!existingUser2 == id && !existingUser1 == id){
-			return next(
-				new HandleError('nationalId or email is already registered.', 400)
-			);
-		}
-		//!conT
-	}
-
-	const updatedUser = await User.findByIdAndUpdate(id, req?.body, {
+	const updatedUser = await User.findByIdAndUpdate(id, others, {
 		new: true,
 		runValidators: true,
 	}).select('-password -__v');
+	if(!updatedUser){
+		return next(new HandleError(`User with ID ${id} not found.`, 404));
+	}
 
 	return res.status(200).json({
 		success: true,
@@ -68,6 +58,7 @@ export const updateUser = catchAsync(async (req, res, next) => {
 				nationalId: updatedUser.nationalId,
 				email: updatedUser.email,
 				profileImage: updatedUser.profileImage,
+				grade: updatedUser.gradeIn,
 			},
 		},
 	});
@@ -123,7 +114,10 @@ export const createUser = catchAsync(async (req, res, next) => {
 	const existingUser2 = await User.findOne({ email });
 	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
 		return next(
-			new HandleError('nationalId or email is already registered.', 400)
+			new HandleError(
+				'nationalId or email is already registered for another admin or user.',
+				400
+			)
 		);
 	}
 
@@ -141,6 +135,7 @@ export const createUser = catchAsync(async (req, res, next) => {
 				nationalId: newUser.nationalId,
 				email: newUser.email,
 				profileImage: newUser.profileImage,
+				grade: newUser.gradeIn,
 			},
 		},
 	});

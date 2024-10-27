@@ -68,19 +68,22 @@ const userSchema = new mongoose.Schema(
 				'humanities-12th',
 			],
 		},
-		preferredCourses: {
-			type: {
-				name: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: 'Courses',
+		preferredCourses: [
+			{
+				type: {
+					course: {
+						type: mongoose.Schema.Types.ObjectId,
+						ref: 'Courses',
+						default: '671cbf21576e48cfce0e7c3f',
+					},
+					isImpo: {
+						type: Boolean,
+						default: false,
+					},
 				},
-				isImpo: {
-					type: Boolean,
-					default: false,
-				},
+				default: {},
 			},
-			default: {},
-		},
+		],
 	},
 	{ timestamps: true }
 );

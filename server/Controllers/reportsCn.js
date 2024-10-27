@@ -17,7 +17,7 @@ export const getAllReports = catchAsync(async (req, res, next) => {
 			.limitFields()
 			.paginate()
 			.populate('*')
-			.select('-__v');
+			.select('-__v')
 		data = await features.query;
 	} else if (role === 'admin') {
 		const features = new ApiFeatures(Reports, req.query)
