@@ -137,10 +137,8 @@ export const checkForgetPassword = catchAsync(async (req, res, next) => {
 		);
 	}
 
-	// const verificationResult = verifyEmailCode(email, code);
-	//!verificationResult.authorized
-	if (false) {
-		//TODO pick false when bug corrected
+	const verificationResult = await verifyEmailCode(email, code);
+	if (!verificationResult.authorized) {
 		return next(new HandleError('Invalid verification code.', 401));
 	}
 

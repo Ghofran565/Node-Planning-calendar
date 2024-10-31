@@ -6,7 +6,7 @@ import catchAsync from '../Utils/catchAsync.js';
 
 const createTransporter = () => {
 	return nodemailer.createTransport({
-		//? maybe wanna not to use gmail 
+		//? maybe wanna not to use gmail
 		service: 'gmail',
 		auth: {
 			user: process.env.EMAIL_USER,
@@ -38,7 +38,9 @@ export const sendEmailCode = catchAsync(async (email, next) => {
 	try {
 		await sendMail(transporter, mailOptions);
 	} catch (error) {
-		return next(new HandleError('Could not send the email. Please try again later.', 500));
+		return next(
+			new HandleError('Could not send the email. Please try again later.', 500)
+		);
 	}
 
 	return {
@@ -47,27 +49,26 @@ export const sendEmailCode = catchAsync(async (email, next) => {
 	};
 });
 
-export const verifyEmailCode = catchAsync(async (email, code) => {
-	console.log('OK email 1');
+export const verifyEmailCode = async (email, code) => {
+	try {
+		const emailVerificationCheck = await EmailVerification.findOne({
+			email,
+			code,
+		});
 
-	const emailVerificationCheck = await EmailVerification.findOne({
-		email,
-		code,
-	});
-
-	console.log('OK email 2');
-
-	if (!emailVerificationCheck) {
-		console.log('OK email 3');
-		return {	
-			authorized: false,
-			// message: 'Verification code is incorrect or expired.',
-		};
-	} else {
-		await EmailVerification.deleteMany({ email });
-		return {
-			authorized: true,
-			// message: 'Email authorized successfully.',
-		};
+		if (!emailVerificationCheck) {
+			return {
+				authorized: false,
+				// message: 'Verification code is incorrect or expired.',
+			};
+		} else {
+			await EmailVerification.deleteMany({ email });
+			return {
+				authorized: true,
+				// message: 'Email authorized successfully.',
+			};
+		}
+	} catch (err) {
+		console.log(err);
 	}
-});
+};

@@ -6,6 +6,7 @@ export const getAllCourses = catchAsync(async (req, res, next) => {
 	const data = await Courses.find().select('-__v');
 	return res.status(200).json({
 		success: true,
+		result: data.length,
 		data: { data },
 	});
 });

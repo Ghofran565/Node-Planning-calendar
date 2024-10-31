@@ -6,18 +6,20 @@ import HandleError from '../Utils/handleError.js';
 
 export const getAllReports = catchAsync(async (req, res, next) => {
 	const { id: userId, role } = req.decodedToken;
+	let data;
 
 	if (role === 'supporter' || role === 'parent') {
 		const admin = await Admin.findById(userId);
 		const studentIds = admin.studentsIds;
-
+		// req.query = filters[userId]={  $in: studentIds }
 		const features = new ApiFeatures(Reports, req.query)
-			.filters({ userId: { $in: studentIds } })
+			.filters()
 			.sort()
 			.limitFields()
 			.paginate()
-			.populate('*')
-			.select('-__v')
+			.populate()
+		.select('-__v')
+		//{ userId: { $in: studentIds } }
 		data = await features.query;
 	} else if (role === 'admin') {
 		const features = new ApiFeatures(Reports, req.query)
@@ -25,12 +27,12 @@ export const getAllReports = catchAsync(async (req, res, next) => {
 			.sort()
 			.limitFields()
 			.paginate()
-			.populate('*')
-			.select('-__v');
+			.populate()
+			// .select('-__v');
 		data = await features.query;
 	} else {
 		data = await Reports.findOne({ userId: userId })
-			.populate('*')
+			.populate('*') //eliminate all '*'
 			.select('-__v');
 	}
 
@@ -211,7 +213,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 				);
 			}
 		}
-	}else {
+	} else {
 		return next(new HandleError('You do not have the permission', 401));
 	}
 
@@ -227,5 +229,4 @@ export const registerComment = catchAsync(async (req, res, next) => {
 			},
 		},
 	});
-
 });

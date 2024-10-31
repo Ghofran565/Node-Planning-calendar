@@ -74,7 +74,6 @@ const userSchema = new mongoose.Schema(
 					course: {
 						type: mongoose.Schema.Types.ObjectId,
 						ref: 'Courses',
-						default: '671cbf21576e48cfce0e7c3f',
 					},
 					isImpo: {
 						type: Boolean,

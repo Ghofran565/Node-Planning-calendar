@@ -18,6 +18,7 @@ export const getAllUser = catchAsync(async (req, res, next) => {
 	const users = await userFeatures.query;
 	return res.status(200).json({
 		success: true,
+		result: data.length,
 		data: { users },
 	});
 });
@@ -40,13 +41,13 @@ export const getUser = catchAsync(async (req, res, next) => {
 
 export const updateUser = catchAsync(async (req, res, next) => {
 	const { id } = req.params;
-	const { nationalId, email, password, others } = req?.body;
+	const { nationalId = '', email = '', password = '', ...others } = req?.body;
 
 	const updatedUser = await User.findByIdAndUpdate(id, others, {
 		new: true,
 		runValidators: true,
 	}).select('-password -__v');
-	if(!updatedUser){
+	if (!updatedUser) {
 		return next(new HandleError(`User with ID ${id} not found.`, 404));
 	}
 
