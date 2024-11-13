@@ -18,7 +18,7 @@ export const getAllUser = catchAsync(async (req, res, next) => {
 	const users = await userFeatures.query;
 	return res.status(200).json({
 		success: true,
-		result: data.length,
+		result: users.length,
 		data: { users },
 	});
 });

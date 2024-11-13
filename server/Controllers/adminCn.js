@@ -17,7 +17,7 @@ export const getAllAdmin = catchAsync(async (req, res, next) => {
 	const admins = await features.query;
 	return res.status(200).json({
 		success: true,
-		result: data.length,
+		result: admins.length,
 		data: { admins },
 	});
 });

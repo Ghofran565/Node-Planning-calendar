@@ -6,7 +6,7 @@ import { sendEmailCode, verifyEmailCode } from '../Utils/emailHandler.js';
 import User from '../Models/userMd.js';
 import Admin from './../Models/adminMd.js';
 
-const expireTime = '5d';
+const expireTime = '10d';
 
 const nationalIdRegex = /^[0-9]{10}$/;
 const emailRegex = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;

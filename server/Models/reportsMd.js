@@ -72,7 +72,7 @@ const reportsSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
 			required: [true, 'UserId is required'],
-			unique: [true, "This user has it's reports borad"],
+			unique: [true, "This user has it's reports board"],
 		},
 		records: [recordsSchema],
 	},

@@ -12,4 +12,5 @@ mongoose
 	.then(() => console.log('📚 Database is connected and ready to use'))
 	.catch((err) => console.log(err));
 
-app.listen(port, () => console.log(`🌐 Server is running on port ${port} :]`));
+app.listen(port, () => console.log(`🌐 Server is running on port ${port} :]` + `\nServer address: http://localhost:${port}` + `\nSwagger UI available at http://localhost:${port}/api-docs`
+));

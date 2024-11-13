@@ -11,16 +11,15 @@ export const getAllReports = catchAsync(async (req, res, next) => {
 	if (role === 'supporter' || role === 'parent') {
 		const admin = await Admin.findById(userId);
 		const studentIds = admin.studentsIds;
-		// req.query = filters[userId]={  $in: studentIds }
+		req.query = { userId: { $in: studentIds } }; //! prob 
 		const features = new ApiFeatures(Reports, req.query)
 			.filters()
 			.sort()
 			.limitFields()
 			.paginate()
 			.populate()
-		.select('-__v')
-		//{ userId: { $in: studentIds } }
-		data = await features.query;
+			data = await features.query;
+			console.log("first admin")
 	} else if (role === 'admin') {
 		const features = new ApiFeatures(Reports, req.query)
 			.filters()
@@ -28,12 +27,12 @@ export const getAllReports = catchAsync(async (req, res, next) => {
 			.limitFields()
 			.paginate()
 			.populate()
-			// .select('-__v');
-		data = await features.query;
+
+			data = await features.query;
+			console.log("else admin")
 	} else {
 		data = await Reports.findOne({ userId: userId })
-			.populate('*') //eliminate all '*'
-			.select('-__v');
+		console.log("else")
 	}
 
 	return res.status(200).json({
@@ -70,19 +69,27 @@ export const getIdReports = catchAsync(async (req, res, next) => {
 });
 
 export const createRecord = catchAsync(async (req, res, next) => {
-	const { id: userId } = req.decodedToken;
+	const { id: userId, role } = req.decodedToken;
 	const { parentComment, supporterComment, isConfirmed, ...others } = req?.body;
 
-	if (!role === undefined) {
+console.log(req.decodedToken)
+console.log(req.decodedToken.role)
+
+	if (role !== undefined) {
 		return next(new HandleError('You do not have the permission', 401));
 	}
 
 	const report = await Reports.findOne({ userId: userId }).populate('*');
 
+console.log(report)
+
 	const admin = await Admin.findOne({
 		studentsIds: { $in: userId },
 		role: 'parent',
 	}).populate('*');
+
+	console.log(admin)
+	console.log(admin.isConfirming)
 
 	if (admin.isConfirming) {
 		report.records.push(...others);
