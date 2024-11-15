@@ -10,8 +10,11 @@ export const getAllReports = catchAsync(async (req, res, next) => {
 
 	if (role === 'supporter' || role === 'parent') {
 		const admin = await Admin.findById(userId);
-		const studentIds = admin.studentsIds;
-		req.query = { userId: { $in: studentIds } }; //! prob 
+		const studentsIds = admin.studentsIds;
+		if(!studentsIds[0]){
+			return next(new HandleError('Sorry, but no students were registered for you', 400));
+		}
+		req.query = { userId: { $in: studentsIds } }; //! prob 
 		const features = new ApiFeatures(Reports, req.query)
 			.filters()
 			.sort()
@@ -50,10 +53,14 @@ export const getIdReports = catchAsync(async (req, res, next) => {
 	if (role === undefined) {
 		data = await Reports.findOne({ userId: userId })
 			.select('-__v')
-			.populate('*');
+			.populate();
+			// .populate('*');
 	} else {
 		const admin = await Admin.findById(userId);
 		const studentIds = admin.studentsIds;
+		if(!studentsIds[0]){
+			return next(new HandleError('Sorry, but no students were registered for you', 400));
+		}
 		if (studentIds.includes(id) || role === 'admin') {
 			data = await Reports.findOne({ userId: id }).select('-__v').populate('*');
 		} else {
@@ -179,7 +186,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 			.populate('*');
 		if (!updatedReport) {
 			new HandleError(
-				'There was a problem in update query, no returns recived',
+				'There was a problem in update query, no returns received',
 				500
 			);
 		}
@@ -199,7 +206,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 			}
 			if (!updatedReport) {
 				new HandleError(
-					'There was a problem in update query, no returns recived.',
+					'There was a problem in update query, no returns received.',
 					500
 				);
 			}
@@ -215,7 +222,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 			}
 			if (!updatedReport) {
 				new HandleError(
-					'There was a problem in update query, no returns recived.',
+					'There was a problem in update query, no returns received.',
 					500
 				);
 			}
