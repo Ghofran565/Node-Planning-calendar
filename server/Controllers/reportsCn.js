@@ -11,7 +11,8 @@ export const getAllReports = catchAsync(async (req, res, next) => {
 	if (role === 'supporter' || role === 'parent') {
 		const admin = await Admin.findById(userId);
 		const studentIds = admin.studentsIds;
-		req.query = { userId: { $in: studentIds } }; //! prob 
+		req.query =new URLSearchParams( { userId: { $in: studentIds } }); //!conT
+		console.log(req.query)
 		const features = new ApiFeatures(Reports, req.query)
 			.filters()
 			.sort()
