@@ -1,3 +1,4 @@
+# This Readme file hasn't been completed yet
 
 # Node.js Planning Calendar
 
