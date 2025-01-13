@@ -10,28 +10,28 @@ const recordSchema = new mongoose.Schema({
 		hours: {
 			type: Number,
 			default: 0,
-			min:0,
-			max:23,
+			min: 0,
+			max: 23,
 		},
 		minutes: {
 			type: Number,
 			default: 0,
-			min:0,
-			max:59,
+			min: 0,
+			max: 59,
 		},
 	},
 	teachDuration: {
 		hours: {
 			type: Number,
 			default: 0,
-			min:0,
-			max:23,
+			min: 0,
+			max: 23,
 		},
 		minutes: {
 			type: Number,
 			default: 0,
-			min:0,
-			max:59,
+			min: 0,
+			max: 59,
 		},
 	},
 });
@@ -74,7 +74,7 @@ const reportsSchema = new mongoose.Schema(
 			required: [true, 'UserId is required'],
 			unique: [true, "This user has it's reports board"],
 		},
-		records: [recordsSchema],
+		records: { type: [recordsSchema], required: true },
 	},
 	{ timestamps: true }
 );

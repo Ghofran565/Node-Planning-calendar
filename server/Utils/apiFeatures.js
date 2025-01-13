@@ -1,6 +1,6 @@
 class ApiFeatures {
-	constructor(query, queryString) {
-		this.query = query;
+	constructor(query, queryString, initialQuery = {}) {
+		this.query = query.find(initialQuery);
 		this.queryString = queryString;
 	};
 	filters() {

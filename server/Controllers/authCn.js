@@ -194,7 +194,7 @@ export const changePassword = catchAsync(async (req, res, next) => {
 		person = admin;
 	} else {
 		return next(
-			new HandleError('No users or admins found by this NationalId.', 404)
+			new HandleError('(Un)expected error. (actually it was expected but really rare to happen)', 404)
 		);
 	}
 

@@ -12,6 +12,6 @@ const router = express.Router();
 router.route('/auth').post(auth);
 router.route('/forget-password').post(forgetPassword);
 router.route('/forget-password-check').post(checkForgetPassword);
-router.route('/change-password').post(isLogin, changePassword); //TODO problems
+router.route('/change-password').post(isLogin, changePassword);
 
 export default router;
