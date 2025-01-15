@@ -1,5 +1,3 @@
-# This Readme file hasn't been completed yet
-
 # Node.js Planning Calendar
 
 This repository hosts a **Planning Calendar API** built with Node.js, designed to manage scheduling, user interactions, and administrative functionalities.
