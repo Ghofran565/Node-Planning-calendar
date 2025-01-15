@@ -4,15 +4,6 @@
 
 This repository hosts a **Planning Calendar API** built with Node.js, designed to manage scheduling, user interactions, and administrative functionalities.
 
-## Features
-
-- **User Management**: Registration, login, and email verification.
-- **Course Management**: CRUD operations for courses.
-- **File Upload**: Handles uploads with validation.
-- **Reporting**: Generates reports based on user and admin inputs.
-- **Admin Control**: Role-based access control for administrators.
-- **Notifications**: Email and SMS integrations.
-
 ## Project Structure
 
 - **Controllers**: Handles business logic for core functionalities.
@@ -38,27 +29,25 @@ This repository hosts a **Planning Calendar API** built with Node.js, designed t
 4. Create a `.env` file using the provided `config.env` template and configure your environment variables.
 5. Start the server:
    ```bash
-   npm start
+   npm run server
    ```
 
-## API Endpoints
+## API Endpoints Examples
 
 | Method | Endpoint           | Description              |
 |--------|--------------------|--------------------------|
-| POST   | `/api/v1/auth/login` | User login               |
-| GET    | `/api/v1/courses`   | Fetch all courses         |
-| POST   | `/api/v1/upload`    | Upload a file            |
-| GET    | `/api/v1/reports`   | Generate reports         |
+| POST   | `/api/auth/login` | User login               |
+| GET    | `/api/courses`   | Fetch all courses         |
+| POST   | `/api/upload`    | Upload a file            |
+| GET    | `/api/reports`   | Generate reports         |
 
 (Refer to the respective route files in the `Routes` directory for full details.)
 
 ## Development Phase
 
-**Phase**: API Testing  
+**Phase**: Finished - small updates needed
 **Current Focus**:  
-- Integration testing of all API endpoints.  
-- Unit testing for individual functionalities.  
-- Debugging and resolving issues identified during testing.
+-   Adding swagger to this project 
 
 This phase ensures the stability and reliability of all API endpoints before moving to production.
 
@@ -72,7 +61,3 @@ Contributions are welcome! Please follow these steps:
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
----
-
-Feel free to enhance this README as the project evolves.
