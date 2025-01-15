@@ -24,3 +24,4 @@ pnpm-debug.log*
 *.sw?
 *.rar
 /pictures
+server/config.env
