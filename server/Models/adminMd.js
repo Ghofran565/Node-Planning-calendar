@@ -19,13 +19,13 @@ const adminSchema = new mongoose.Schema(
 		nationalId: {
 			type: String,
 			required: [true, 'NationalId is required'],
-			match: [/^[0-9]{10}$/g, 'NationalId is invalid.'],
+			match: [/^[0-9]{10}$/, 'NationalId is invalid.'],
 		},
 		email: {
 			type: String,
 			required: [true, 'Email is required.'],
 			unique: [true, 'Email already used.'],
-			match: [/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/g, 'Email is invalid.'],
+			match: [/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/, 'Email is invalid.'],
 		},
 		password: {
 			type: String,

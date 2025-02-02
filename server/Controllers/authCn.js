@@ -6,6 +6,8 @@ import { sendEmailCode, verifyEmailCode } from '../Utils/emailHandler.js';
 import User from '../Models/userMd.js';
 import Admin from './../Models/adminMd.js';
 
+const expireTime = '5d';
+
 const nationalIdRegex = /^[0-9]{10}$/;
 const emailRegex = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
 const verificationCodeRegex = /\b\d{5}\b/;
@@ -18,17 +20,26 @@ const generateToken = (user, additionalPayload = {}) => {
 		role: user.role,
 		...additionalPayload,
 	};
-	return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5d' });
+	return jwt.sign(payload, process.env.JWT_SECRET, {
+		expiresIn: additionalPayload.changePassword ? '1h' : expireTime,
+	});
 };
 
 export const auth = catchAsync(async (req, res, next) => {
 	let person;
 	const { nationalId, password } = req.body;
 	if (!nationalIdRegex.test(nationalId)) {
-		return next(new HandleError('Invalid NationalId format, please check your password.', 400));
+		return next(
+			new HandleError(
+				'Invalid NationalId format, please check your password.',
+				400
+			)
+		);
 	}
 	if (!passwordRegex.test(password)) {
-		return next(new HandleError('Invalid Password, please check your password.', 400));
+		return next(
+			new HandleError('Invalid Password, please check your password.', 400)
+		);
 	}
 
 	const user = await User.findOne({ nationalId });
@@ -44,8 +55,13 @@ export const auth = catchAsync(async (req, res, next) => {
 		);
 	}
 
-	if(!person.password){
-		return next(new HandleError('No password found, please login by forget password.', 400));
+	if (!person.password) {
+		return next(
+			new HandleError(
+				'No password found, please login by forget password.',
+				400
+			)
+		);
 	}
 
 	if (!bcryptjs.compareSync(password, person.password)) {
@@ -59,7 +75,7 @@ export const auth = catchAsync(async (req, res, next) => {
 		data: {
 			token,
 		},
-		message: 'logged in successfuly.',
+		message: 'logged in successfully.',
 	});
 });
 
@@ -68,7 +84,12 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
 	const { nationalId } = req?.body;
 
 	if (!nationalIdRegex.test(nationalId)) {
-		return next(new HandleError('Invalid NationalId format, please check your password.', 400));
+		return next(
+			new HandleError(
+				'Invalid NationalId format, please check your password.',
+				400
+			)
+		);
 	}
 
 	const user = await User.findOne({ nationalId });
@@ -95,7 +116,9 @@ export const checkForgetPassword = catchAsync(async (req, res, next) => {
 	let person;
 	const { email, code } = req?.body;
 	if (!emailRegex.test(email)) {
-		return next(new HandleError('Invalid email format, please check your email.', 400));
+		return next(
+			new HandleError('Invalid email format, please check your email.', 400)
+		);
 	}
 	if (!verificationCodeRegex.test(code)) {
 		return next(new HandleError('Invalid verification code format.', 400));
@@ -114,9 +137,10 @@ export const checkForgetPassword = catchAsync(async (req, res, next) => {
 		);
 	}
 
-	const verificationResult = verifyEmailCode(email, code);
+	// const verificationResult = verifyEmailCode(email, code);
 	//!verificationResult.authorized
-	if ( false) { //TODO pick false when bug coreected
+	if (false) {
+		//TODO pick false when bug corrected
 		return next(new HandleError('Invalid verification code.', 401));
 	}
 

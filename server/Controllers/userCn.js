@@ -6,7 +6,7 @@ import User from '../Models/userMd.js';
 import Admin from './../Models/adminMd.js';
 import Reports from '../Models/reportsMd.js';
 
-const passwordRegex = /(?=.*?[a-z])(?=.*?[0-9]).{8,}$/g;
+const passwordRegex = /(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
 
 export const getAllUser = catchAsync(async (req, res, next) => {
 	const userFeatures = new ApiFeatures(User, req.query)
@@ -26,7 +26,7 @@ export const getUser = catchAsync(async (req, res, next) => {
 	const { id } = req.params;
 	const { id: userId, role } = req.decodedToken;
 	if (id !== userId && role !== 'admin') {
-		return next(new HandleError('You do not have the premission', 401));
+		return next(new HandleError('You do not have the permission', 401));
 	}
 	const user = await User.findById(id).select('-password -__v');
 	if (!user) {
@@ -39,14 +39,26 @@ export const getUser = catchAsync(async (req, res, next) => {
 });
 
 export const updateUser = catchAsync(async (req, res, next) => {
-	const updatedUser = await User.findByIdAndUpdate(
-		id,
-		req?.body,
-		{
-			new: true,
-			runValidators: true,
+	const { id } = req.params;
+	const { nationalId, email, ...others } = req?.body;
+
+	const existingAdmin1 = await Admin.findOne({ nationalId });
+	const existingAdmin2 = await Admin.findOne({ email });
+	const existingUser1 = await User.findOne({ nationalId });
+	const existingUser2 = await User.findOne({ email });
+	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
+		if(!existingUser2 == id && !existingUser1 == id){
+			return next(
+				new HandleError('nationalId or email is already registered.', 400)
+			);
 		}
-	).select('-password -__v');
+		//!conT
+	}
+
+	const updatedUser = await User.findByIdAndUpdate(id, req?.body, {
+		new: true,
+		runValidators: true,
+	}).select('-password -__v');
 
 	return res.status(200).json({
 		success: true,
@@ -63,13 +75,7 @@ export const updateUser = catchAsync(async (req, res, next) => {
 
 export const chengePassword = catchAsync(async (req, res, next) => {
 	const { id } = req.decodedToken;
-	const { id: bodyId, oldPass, newPass } = req?.body;
-
-	if (id !== bodyId) {
-		return next(
-			new HandleError('Unauthorized request. User ID mismatch.', 401)
-		);
-	}
+	const { oldPass, newPass } = req?.body;
 
 	if (!passwordRegex.test(newPass)) {
 		return next(
@@ -80,13 +86,19 @@ export const chengePassword = catchAsync(async (req, res, next) => {
 		);
 	}
 
-	const getuser = await User.findById(id);
-	if (!getuser) {
+	const getUser = await User.findById(id);
+	if (!getUser) {
 		return next(new HandleError('User not found. Please try again.', 404));
 	}
 
-	if (!bcryptjs.compareSync(oldPass, getuser.password)) {
+	if (!bcryptjs.compareSync(oldPass, getUser.password)) {
 		return next(new HandleError('Wrong password. Please try again.', 401));
+	}
+
+	if (oldPass == newPass) {
+		return next(
+			new HandleError('Same password. Can not chenge the password.', 401)
+		);
 	}
 
 	const hashedPassword = bcryptjs.hashSync(newPass, 10);
@@ -103,35 +115,23 @@ export const chengePassword = catchAsync(async (req, res, next) => {
 });
 
 export const createUser = catchAsync(async (req, res, next) => {
-	const { nationalId, password, ...others } = req?.body;
-	if (!passwordRegex.test(password)) {
+	const { nationalId, email, ...others } = req?.body;
+
+	const existingAdmin1 = await Admin.findOne({ nationalId });
+	const existingAdmin2 = await Admin.findOne({ email });
+	const existingUser1 = await User.findOne({ nationalId });
+	const existingUser2 = await User.findOne({ email });
+	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
 		return next(
-			new HandleError(
-				'Password must be at least 8 characters long and contain at least one letter and one number.',
-				400
-			)
+			new HandleError('nationalId or email is already registered.', 400)
 		);
 	}
 
+	const newUser = await User.create(req?.body);
 
-	const existingAdmin = await Admin.findOne({ nationalId });
-	const existingUser = await User.findOne({ nationalId });
-	if (existingAdmin || existingUser) {
-		return next(new HandleError('nationalId is already registered.', 400));
-	}
-
-	const hashedPassword = bcryptjs.hashSync(password, 10);
-
-	const newUser = await User.create({
-		nationalId,
-		password: hashedPassword,
-		...others,
+	await Reports.create({
+		userId: newUser._id,
 	});
-	
-	const newRoport = await Reports.create({
-		userId: newUser._id
-	});
-
 
 	return res.status(201).json({
 		success: true,

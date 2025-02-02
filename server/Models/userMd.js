@@ -26,17 +26,17 @@ const userSchema = new mongoose.Schema(
 		nationalId: {
 			type: String,
 			required: [true, 'NationalId is required'],
-			match: [/^[0-9]{10}$/g, 'NationalId is invalid.'],
+			match: [/^[0-9]{10}$/, 'NationalId is invalid.'],
 		},
-		brithday: {
+		birthdate: {
 			type: Date,
-			required: [true, 'Brithday is required'],
+			required: [true, 'birthdate is required'],
 		},
 		email: {
 			type: String,
 			required: [true, 'Email is required.'],
 			unique: [true, 'Email already used.'],
-			match: [/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/g, 'Email is invalid.'],
+			match: [/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/, 'Email is invalid.'],
 		},
 		password: {
 			type: String,
@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema(
 				'humanities-12th',
 			],
 		},
-		preferedCourses: {
+		preferredCourses: {
 			type: {
 				name: {
 					type: mongoose.Schema.Types.ObjectId,
@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema(
 					default: false,
 				},
 			},
-			default: [],
+			default: {},
 		},
 	},
 	{ timestamps: true }

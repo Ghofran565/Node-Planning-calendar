@@ -10,7 +10,7 @@ const coursesSchema = new mongoose.Schema({
 		match: [/^[a-zA-Z0-9]+$/, 'Name invalid'],
 	},
 
-	preferedGrades: {
+	preferredGrades: {
 		type: [
 			{
 				type: String,

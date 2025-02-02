@@ -5,7 +5,7 @@ import ApiFeatures from '../Utils/apiFeatures.js';
 import Admin from './../Models/adminMd.js';
 import User from '../Models/userMd.js';
 
-const passwordRegex = /(?=.*?[a-z])(?=.*?[0-9]).{8,}$/g;
+const passwordRegex = /(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
 
 export const getAllAdmin = catchAsync(async (req, res, next) => {
 	const features = new ApiFeatures(Admin, req.query)
@@ -25,7 +25,7 @@ export const getAdmin = catchAsync(async (req, res, next) => {
 	const { id } = req.params;
 	const { id: adminId, role } = req.decodedToken;
 	if (id !== adminId && role !== 'admin') {
-		return next(new HandleError('You do not have the premission', 401));
+		return next(new HandleError('You do not have the permission', 401));
 	}
 	const admin = await Admin.findById(id).select('-password -__v');
 	if (!admin) {
@@ -38,6 +38,19 @@ export const getAdmin = catchAsync(async (req, res, next) => {
 });
 
 export const updateAdmin = catchAsync(async (req, res, next) => {
+	const { id } = req.params;
+	const { nationalId, email, ...others } = req?.body;
+
+	const existingAdmin1 = await Admin.findOne({ nationalId });
+	const existingAdmin2 = await Admin.findOne({ email });
+	const existingUser1 = await User.findOne({ nationalId });
+	const existingUser2 = await User.findOne({ email });
+	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
+		return next(
+			new HandleError('nationalId or email is already registered.', 400)
+		);
+	}
+
 	const updatedAdmin = await Admin.findByIdAndUpdate(id, req?.body, {
 		new: true,
 		runValidators: true,
@@ -59,13 +72,7 @@ export const updateAdmin = catchAsync(async (req, res, next) => {
 
 export const chengePasswordAdmin = catchAsync(async (req, res, next) => {
 	const { id } = req.decodedToken;
-	const { id: bodyId, oldPass, newPass } = req?.body;
-
-	if (id !== bodyId) {
-		return next(
-			new HandleError('Unauthorized request. Admin ID mismatch.', 401)
-		);
-	}
+	const { oldPass, newPass } = req?.body;
 
 	if (!passwordRegex.test(newPass)) {
 		return next(
@@ -85,6 +92,12 @@ export const chengePasswordAdmin = catchAsync(async (req, res, next) => {
 		return next(new HandleError('Wrong password.', 401));
 	}
 
+	if (oldPass == newPass) {
+		return next(
+			new HandleError('Same password. Can not chenge the password.', 401)
+		);
+	}
+
 	const hashedPassword = bcryptjs.hashSync(newPass, 10);
 	await Admin.findByIdAndUpdate(
 		id,
@@ -99,29 +112,19 @@ export const chengePasswordAdmin = catchAsync(async (req, res, next) => {
 });
 
 export const createAdmin = catchAsync(async (req, res, next) => {
-	const { nationalId, password, ...others } = req?.body;
-	if (!passwordRegex.test(password)) {
+	const { nationalId, email, ...others } = req?.body;
+
+	const existingAdmin1 = await Admin.findOne({ nationalId });
+	const existingAdmin2 = await Admin.findOne({ email });
+	const existingUser1 = await User.findOne({ nationalId });
+	const existingUser2 = await User.findOne({ email });
+	if (existingAdmin1 || existingUser2 || existingAdmin2 || existingUser1) {
 		return next(
-			new HandleError(
-				'Password must be at least 8 characters long and contain at least one letter and one number.',
-				400
-			)
+			new HandleError('nationalId or email is already registered.', 400)
 		);
 	}
 
-	const existingAdmin = await Admin.findOne({ nationalId });
-	const existingUser = await User.findOne({ nationalId });
-	if (existingAdmin || existingUser) {
-		return next(new HandleError('nationalId is already registered.', 400));
-	}
-
-	const hashedPassword = bcryptjs.hashSync(password, 10);
-
-	const newAdmin = await Admin.create({
-		nationalId,
-		password: hashedPassword,
-		...others,
-	});
+	const newAdmin = await Admin.create(req?.body);
 
 	return res.status(201).json({
 		success: true,
@@ -131,6 +134,7 @@ export const createAdmin = catchAsync(async (req, res, next) => {
 				nationalId: newAdmin.nationalId,
 				email: newAdmin.email,
 				profileImage: newAdmin.profileImage,
+				role: newAdmin.role,
 			},
 		},
 	});

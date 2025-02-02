@@ -56,7 +56,7 @@ export const getIdReports = catchAsync(async (req, res, next) => {
 		if (studentIds.includes(id) || role === 'admin') {
 			data = await Reports.findOne({ userId: id }).select('-__v').populate('*');
 		} else {
-			return next(new HandleError('You do not have the premission', 401));
+			return next(new HandleError('You do not have the permission', 401));
 		}
 	}
 
@@ -72,7 +72,7 @@ export const createRecord = catchAsync(async (req, res, next) => {
 	const { parentComment, supporterComment, isConfirmed, ...others } = req?.body;
 
 	if (!role === undefined) {
-		return next(new HandleError('You do not have the premission', 401));
+		return next(new HandleError('You do not have the permission', 401));
 	}
 
 	const report = await Reports.findOne({ userId: userId }).populate('*');
@@ -108,7 +108,7 @@ export const confirmRecord = catchAsync(async (req, res, next) => {
 	const { id: userId, role } = req.decodedToken;
 
 	if (!role === 'parent') {
-		return next(new HandleError('You do not have the premission', 401));
+		return next(new HandleError('You do not have the permission', 401));
 	}
 
 	const admin = await Admin.findById(userId);
@@ -125,13 +125,13 @@ export const confirmRecord = catchAsync(async (req, res, next) => {
 				.select('-__v')
 				.populate('*');
 		} else {
-			return next(new HandleError('Id mismatch, no premission', 401));
+			return next(new HandleError('Id mismatch, no permission', 401));
 		}
 		if (!updatedReport) {
 			new HandleError('There was a problem in confirming record.', 500);
 		}
 	} else {
-		return next(new HandleError('You do not have the premission', 401));
+		return next(new HandleError('You do not have the permission', 401));
 	}
 
 	return res.status(200).json({
@@ -153,7 +153,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 	const { comment } = req?.body;
 
 	if (role === 'admin') {
-		return next(new HandleError('You do not have the premission', 401));
+		return next(new HandleError('You do not have the permission', 401));
 	}
 	const admin = await Admin.findById(userId);
 	const studentIds = admin.studentsIds;
@@ -161,7 +161,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 	if (role == undefined) {
 		const report = await Reports.findOne({ userId: userId }).populate('*');
 		if (!report.records.findIndex((record) => record._id === id)) {
-			return next(new HandleError('You do not have the premission', 401));
+			return next(new HandleError('You do not have the permission', 401));
 		}
 
 		updatedReport = await Reports.records
@@ -186,7 +186,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 					.select('-__v')
 					.populate('*');
 			} else {
-				return next(new HandleError('Id mismatch, no premission', 401));
+				return next(new HandleError('Id mismatch, no permission', 401));
 			}
 			if (!updatedReport) {
 				new HandleError(
@@ -202,7 +202,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 					.select('-__v')
 					.populate('*');
 			} else {
-				return next(new HandleError('Id mismatch, no premission', 401));
+				return next(new HandleError('Id mismatch, no permission', 401));
 			}
 			if (!updatedReport) {
 				new HandleError(
@@ -212,7 +212,7 @@ export const registerComment = catchAsync(async (req, res, next) => {
 			}
 		}
 	}else {
-		return next(new HandleError('You do not have the premission', 401));
+		return next(new HandleError('You do not have the permission', 401));
 	}
 
 	return res.status(201).json({
