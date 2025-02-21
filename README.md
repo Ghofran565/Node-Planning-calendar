@@ -2,6 +2,9 @@
 
 This repository hosts a **Planning Calendar API** built with Node.js, designed to manage scheduling, user interactions, and administrative functionalities.
 
+# Postman's workspace link
+- www.postman.com/ghofran565/planning-calendar
+
 ## Project Structure
 
 - **Controllers**: Handles business logic for core functionalities.
@@ -43,7 +46,8 @@ This repository hosts a **Planning Calendar API** built with Node.js, designed t
 
 ## Development Phase
 
-**Phase**: Finished - small updates needed
+**Phase**: Finished - small updates are necessary
+
 **Current Focus**:  
 -   Adding swagger to this project 
 
